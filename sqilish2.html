@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Siqilishni yo‘qotish | 5 daqiqalik relaks</title>
+
+  <!-- ==================== META ==================== -->
+  <meta name="description" content="5 daqiqada siqilishdan xalos bo‘lish uchun psixologik relaks sahifa" />
+
+  <!-- ==================== STYLE (CSS) ==================== -->
+  <style>
+    /* RESET */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      background: linear-gradient(120deg, #cfd9df, #e2ebf0);
+      transition: background 1.5s ease;
+    }
+
+    .container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      max-width: 700px;
+      width: 100%;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+      text-align: center;
+      animation: fadeIn 1.2s ease;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #444;
+      margin-bottom: 25px;
+    }
+
+    button {
+      padding: 16px 28px;
+      font-size: 18px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+    }
+
+    .hidden { display: none; }
+
+    /* RELAX MODE */
+    body.relax {
+      background: radial-gradient(circle at top, #0f2027, #203a43, #000000);
+    }
+
+    .relax-box {
+      color: #fff;
+      text-align: center;
+      animation: fadeIn 1.5s ease;
+    }
+
+    .frequency {
+      font-size: 64px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      animation: pulse 2.5s infinite;
+    }
+
+    .message {
+      font-size: 24px;
+      line-height: 1.7;
+      max-width: 800px;
+      margin: 0 auto 20px;
+    }
+
+    .timer {
+      margin-top: 20px;
+      font-size: 16px;
+      opacity: 0.7;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== START SCREEN ==================== -->
+  <div class="container" id="startScreen">
+    <div class="card">
+      <h1>Sening siqilishing — bu vaqtinchalik</h1>
+      <p>
+        Agar hozir ichingda tushunarsiz bosim bo‘lsa,
+        bil: sen yolg‘iz emassan. Bu sahifa seni
+        tinchlantirish uchun yaratilgan.
+      </p>
+      <button onclick="startRelax()">
+        Ishni boshlaylik — siqilishni ketkazamiz
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== RELAX SCREEN ==================== -->
+  <div class="container hidden" id="relaxScreen">
+    <div class="relax-box">
+      <div class="frequency">432 Hz</div>
+      <div class="message" id="message"></div>
+      <div class="timer" id="timer"></div>
+
+      <audio id="audio" loop>
+        <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_1f7c48c4a6.mp3" type="audio/mpeg" />
+      </audio>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPT (JS) ==================== -->
+  <script>
+    const messages = [
+      "Agar sen sababini bilmasdan siqilayotgan bo‘lsang — bu normal holat.",
+      "Hozir tanang sekin-asta bo‘shashyapti.",
+      "Chuqur nafas ol… va ichingdagi bosim chiqib ketmoqda.",
+      "Senga hozir hech narsa isbotlash shart emas.",
+      "Siqilish — bu charchagan ong belgisi, sen yomon emassan.",
+      "Tanang seni himoyalayapti, u tinchlanishni xohlayapti.",
+      "Har soniyada ichingda yengillik paydo bo‘lmoqda.",
+      "Senga hozir faqat shu lahza yetarli.",
+      "Barcha tashvishlar vaqtincha to‘xtadi.",
+      "5 daqiqadan so‘ng sen o‘zingni ancha yengil his qilasan."
+    ];
+
+    let index = 0;
+    let timeLeft = 300; // 5 daqiqa
+    let messageInterval;
+    let timerInterval;
+
+    function startRelax() {
+      document.body.classList.add('relax');
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('relaxScreen').classList.remove('hidden');
+
+      const audio = document.getElementById('audio');
+      audio.volume = 0.5;
+      audio.play();
+
+      const msg = document.getElementById('message');
+      msg.innerText = messages[0];
+
+      messageInterval = setInterval(() => {
+        index = (index + 1) % messages.length;
+        msg.innerText = messages[index];
+      }, 5000);
+
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      const t = document.getElementById('timer');
+      const min = Math.floor(timeLeft / 60);
+      const sec = timeLeft % 60;
+      t.innerText = `Qolgan vaqt: ${min}:${sec.toString().padStart(2,'0')}`;
+
+      timeLeft--;
+      if (timeLeft < 0) {
+        clearInterval(timerInterval);
+        clearInterval(messageInterval);
+        t.innerText = "Mashq yakunlandi. Siz tinchlandingiz.";
+      }
+    }
+  </script>
+
+</body>
+</html>
